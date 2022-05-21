@@ -1,10 +1,11 @@
 import React,{useState,useEffect} from 'react'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth,signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import './App.css';
 import Post from './components/Post';
 import {db,registerWithEmailAndPassword,auth,Google} from './functions/Firebase'
 import {Modal,Button,Input, makeStyles} from '@material-ui/core';
 import { addDoc,collection,getDocs } from "firebase/firestore";
+import ImageUpload from './components/ImageUpload';
 
 
 function getModalStyle() {
@@ -38,16 +39,17 @@ function App() {
    const [open, setOpen]=useState(false);
    const classes = useStyles();
     const [modalStyle] = React.useState(getModalStyle);
-    const [openSignin,setOpenSignin]=useState('');
+    const [openSignIn,setOpenSignIn]=useState("");
   const [email, setEmail]= useState("");
   const [password,setPassword]=useState("");
   const [username,setUsername]=useState("");
   const [user,setUser]=useState(null);
+  const [openSignUp, setOpenSignUp]= useState("");
 
 
   useEffect(()=> {
     const getposts= async ()=> {
-      const data= await getDocs(postsCollectionRef);
+      const data= await getDocs.orderBy('timestamp','desc')(postsCollectionRef);
       setPosts(data.docs.map((doc)=>({...doc.data(),id:doc.id})))
     };
     getposts();
@@ -104,6 +106,7 @@ useEffect(()=>{
       console.error(err);
       alert(err.message);
     }
+      setOpenSignUp(false);
   };
 
   const handleOpen = () => {
@@ -114,19 +117,40 @@ useEffect(()=>{
     setOpen(false);
   };
 
-  const body= (
-    <div>
-    <h2>check this out niggs</h2>
-   
-    </div>
-  )
+ 
+
+
+  //signing in function
+  const signIn= async(event)=>{
+    event.preventDefault();
+
+     try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+      setOpenSignIn(false);
+  };
+
+  
 
   return (
     <div className="App">
+    <div classname='upload'>
+     {user?.displayName ? (
+         <ImageUpload username={user.displayName}/>
+
+      ):(
+        <h3>You have to login to upload</h3>
+            )}
+   
+</div>
+        {/* This is a modal */}
       <Modal
      className='signup-modal'
-  open={open}
-  onClose={handleClose}
+  open={openSignUp}
+  onClose={() =>setOpenSignUp(false)}
   aria-labelledby="simple-modal-title"
   aria-describedby="simple-modal-description"
 >
@@ -161,6 +185,40 @@ useEffect(()=>{
 
   
   </Modal>
+
+
+  <Modal
+     className='signup-modal'
+  open={openSignIn}
+  onClose={()=> setOpenSignIn(false)}
+  aria-labelledby="simple-modal-title"
+  aria-describedby="simple-modal-description"
+>
+   <form className='signup-form'>
+ <center> 
+    <img className='signup-logo' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXm8H7K0a-4nYAwKUu57KI463WaS6BGR7NlFQT5jx05FUdK36UdWbyVyhJaQp6hZAMafM&usqp=CAU'/>
+   </center>
+   
+
+   <Input
+   placeholder="email"
+   type="text"
+   className='signup-input'
+   value={email}
+   onChange={(e)=> setEmail(e.target.value)}/>
+
+   <Input
+   placeholder="password"
+   type="text"
+   value={password}
+    className='signup-input'
+   onChange={(e)=> setPassword(e.target.value)}/>
+   <Button className='signup-btn' type="submit" onClick={signIn}>signin</Button>
+   <Button className='google' type="submit" onClick={Google}>Google</Button>
+</form>
+
+  
+  </Modal>
     
      {/* {header} */}
      <div className='header'>
@@ -169,8 +227,11 @@ useEffect(()=>{
       <h1>Lets fucking do this</h1>
       {user ?(
         <Button onClick={()=> auth.signOut()}>Logout</Button>
-      ):(
-        <Button onClick={() =>setOpen(true)}>Signup</Button>
+      ):(<div className='signs-part'>
+        <Button onClick={() =>setOpenSignIn(true)}>Signin</Button>
+        
+        <Button onClick={() =>setOpenSignUp(true)}>Signup</Button>
+        </div>
       )}
       
       {
@@ -181,8 +242,8 @@ useEffect(()=>{
       }
 
     
-     {/* posts */}
-     {/* posts */}
+    
+     
      
      
 

@@ -4,8 +4,10 @@ import {GoogleAuthProvider,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
  } from "firebase/auth";
+ import { getStorage, ref } from "firebase/storage"
  import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+
     import {getFirestore,query,getDocs,
         collection, where, 
         addDoc,
@@ -24,6 +26,7 @@ import { getAnalytics } from "firebase/analytics";
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const storage= getStorage();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
@@ -92,6 +95,8 @@ const logInWithEmailAndPassword = async (email, password) => {
   export {
     auth,
     db,
+    storage,
+
     Google,
     logInWithEmailAndPassword,
     registerWithEmailAndPassword,
