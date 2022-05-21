@@ -1,0 +1,23 @@
+.Post{
+max-width: 500px;
+border: 1px solid lightgray;
+margin-bottom: 45px;
+}
+.Post-image{
+    width: 100%;
+    object-fit: contain;
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+}
+.Post-comment{
+    font-weight: normal;
+    padding: 20px;
+}
+.Post-header{
+    display: flex;
+    align-items: center;
+    padding:20px;
+}
+.Post-avatar{
+    margin-right: 10px;
+}
